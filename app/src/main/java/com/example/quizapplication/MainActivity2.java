@@ -4,9 +4,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.AlertDialog;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import java.util.Locale;
 
 public class MainActivity2 extends AppCompatActivity implements View.OnClickListener {
     TextView totalQuestionsTextView;
@@ -19,11 +22,21 @@ public class MainActivity2 extends AppCompatActivity implements View.OnClickList
     int currentQuestionIndex = 0;
     String selectedAnswer = "";
 
+    private CountDownTimer quizTimer;
+    private long timeLeftInMillis;
+    private TextView timerTextView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        // initialize the timer
+        setContentView(R.layout.activity_main);
+        timeLeftInMillis = 30000;
+        startQuizTimer();
 
+        timerTextView = findViewById(R.id.timerTextView);
+        // initialize the questions
         totalQuestionsTextView = findViewById(R.id.total_questions);
         questionsTextView = findViewById(R.id.question);
         answerA = findViewById(R.id.answer_A);
@@ -42,8 +55,8 @@ public class MainActivity2 extends AppCompatActivity implements View.OnClickList
         totalQuestionsTextView.setText("Total questions: " + totalQuestion);
         loadNewQuestion();
 
-
     }
+
     @Override
     public void onClick(View view) {
 
@@ -60,14 +73,11 @@ public class MainActivity2 extends AppCompatActivity implements View.OnClickList
             currentQuestionIndex++;
             loadNewQuestion();
 
-
         }else{
             //choices button clicked
             selectedAnswer  = clickedButton.getText().toString();
             clickedButton.setBackgroundColor(Color.MAGENTA);
-
         }
-
     }
 
     void loadNewQuestion() {
@@ -83,6 +93,7 @@ public class MainActivity2 extends AppCompatActivity implements View.OnClickList
 
     }
 
+
     void finishQuiz() {
         String quizStatus = "";
         if (score > totalQuestion * 0.60) {
@@ -96,11 +107,67 @@ public class MainActivity2 extends AppCompatActivity implements View.OnClickList
                 .show();
     }
 
-
-    void restartQuiz(){
+    void restartQuiz() {
         score = 0;
-        currentQuestionIndex =0;
+        currentQuestionIndex = 0;
         loadNewQuestion();
     }
 
+   /* private void startQuizTimer() {
+        quizTimer = new CountDownTimer(timeLeftInMillis, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                timeLeftInMillis = millisUntilFinished;
+                updateTimerText();
+            }
+            @Override
+            public void onFinish() {
+
+                // Time is up, perform any action you want when the timer finishes
+                finishQuiz();
+            }
+        }.start();
+    }
+
+    */
+   private void startQuizTimer() {
+       quizTimer = new CountDownTimer(timeLeftInMillis, 1000) {
+           @Override
+           public void onTick(long millisUntilFinished) {
+               timeLeftInMillis = millisUntilFinished;
+               updateTimerText();
+           }
+
+           @Override
+           public void onFinish() {
+               // Time is up, perform any action you want when the timer finishes
+               if (currentQuestionIndex < totalQuestion) {
+                   // The quiz is not finished, show the finish time alert
+                   finishQuizTimeUp();
+               }
+           }
+       }.start();
+   }
+
+    private void updateTimerText() {
+        int seconds = (int) (timeLeftInMillis / 1000);
+        String timeFormatted = String.format(Locale.getDefault(), "%02d:%02d", seconds / 60, seconds % 60);
+        timerTextView.setText(timeFormatted);
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (quizTimer != null) {
+            quizTimer.cancel();
+        }
+    }
+    void finishQuizTimeUp() {
+        new AlertDialog.Builder(this)
+                .setTitle("Time's Up!")
+                .setMessage("You ran out of time!")
+                .setPositiveButton("OK", (dialogInterface, i) -> {
+                })
+                .setCancelable(false)
+                .show();
+    }
 }
