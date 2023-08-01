@@ -113,23 +113,6 @@ public class MainActivity2 extends AppCompatActivity implements View.OnClickList
         loadNewQuestion();
     }
 
-   /* private void startQuizTimer() {
-        quizTimer = new CountDownTimer(timeLeftInMillis, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                timeLeftInMillis = millisUntilFinished;
-                updateTimerText();
-            }
-            @Override
-            public void onFinish() {
-
-                // Time is up, perform any action you want when the timer finishes
-                finishQuiz();
-            }
-        }.start();
-    }
-
-    */
    private void startQuizTimer() {
        quizTimer = new CountDownTimer(timeLeftInMillis, 1000) {
            @Override
@@ -154,13 +137,7 @@ public class MainActivity2 extends AppCompatActivity implements View.OnClickList
         String timeFormatted = String.format(Locale.getDefault(), "%02d:%02d", seconds / 60, seconds % 60);
         timerTextView.setText(timeFormatted);
     }
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (quizTimer != null) {
-            quizTimer.cancel();
-        }
-    }
+
     void finishQuizTimeUp() {
         new AlertDialog.Builder(this)
                 .setTitle("Time's Up!")
@@ -169,5 +146,12 @@ public class MainActivity2 extends AppCompatActivity implements View.OnClickList
                 })
                 .setCancelable(false)
                 .show();
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (quizTimer != null) {
+            quizTimer.cancel();
+        }
     }
 }
